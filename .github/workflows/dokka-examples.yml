@@ -1,0 +1,54 @@
+name: CI
+
+on: pull_request
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        projects: [
+            ./gradle/dokka/dokka-gradle-example,
+            ./gradle/dokka-kotlinAsJava-example,
+            ./gradle/dokka/dokka-library-publishing-example,
+            ./gradle/dokka/dokka-multimodule-example,
+            ./gradle/dokka/dokka-multiplatform-example
+        ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          working-directory: ${{ matrix.projects }}
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          working-directory: ${{ matrix.projects }}
+      - run: ./gradlew clean build --no-daemon --stacktrace
+  runDokkaHtml:
+    strategy:
+      matrix:
+        projects: [
+            ./gradle/dokka/dokka-gradle-example,
+            ./gradle/dokka-kotlinAsJava-example,
+            ./gradle/dokka/dokka-multiplatform-example
+        ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          working-directory: ${{ matrix.projects }}
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          working-directory: ${{ matrix.projects }}
+      - run: ./gradlew dokkaHtml --no-daemon --stacktrace
+  runDokkaMultiModule:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          working-directory: ./gradle/dokka/dokka-multimodule-example
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          working-directory: ./gradle/dokka/dokka-multimodule-example
+      - run: ./gradlew dokkaHtmlMultiModule --no-daemon --stacktrace
